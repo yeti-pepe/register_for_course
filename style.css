@@ -1,7 +1,27 @@
 .search-form-container {
-    margin-top: 20px
+    margin-top: 20px;
 }
 
 .no-bottom-margin {
-    margin-bottom: 0px
+    margin-bottom: 0px;
+}
+
+.bottom-margin {
+    margin-bottom: 20px;
+}
+
+
+.lectures-table {
+    table-layout: fixed;
+}
+
+.lecture-name-col {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 25%;
+}
+
+.lectures-table td th{
+    padding: 8px 2px;
 }
