@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>인원 확인</title>
+</head>
+<link rel="stylesheet" href="./materialize/css/materialize.min.css">
+<script src="./materialize/js/materialize.min.js"></script>
+<link rel="stylesheet" href="./style.css">
+<script src="./main.js"></script>
+
+<body>
+    <div class="container">
+        <div class="row search-form-container">
+            <div class="col s6">
+                <div class="row no-bottom-margin">
+
+                    <div class="input-field col s2">
+                        <input value="2022" id="year" type="text" class="validate">
+                        <label for="year">년도*</label>
+                    </div>
+
+                    <div class="input-field col s2">
+                        <select>
+                          <option value="1" selected>1학기</option>
+                          <option value="2">2학기</option>
+                          <option value="3">여름학기</option>
+                          <option value="3">겨울학기</option>
+                        </select>
+                        <label>학기*</label>
+                    </div>
+
+                    <div class="input-field col s6">
+                        <input placeholder="강의 이름" value="" id="lecture-name" type="text" class="validate">
+                        <label for="lecture-name">강의명*</label>
+                    </div>
+
+                    <div class="col s2">
+                        <div class="row no-bottom-margin" style="margin-top: 28px;">
+                            <a class="waves-effect waves-light btn-small">Button</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="divider bottom-margin"></div>
+
+        <div class="row tables-container">
+            <div class="col s5 search-result-table">
+                <table class="highlight lectures-table">
+                    <thead>
+                      <tr>
+                          <th class="lecture-name-col">강의명</th>
+                          <th>학수 번호</th>
+                          <th>수업 번호</th>
+                          <th>교수</th>
+                          <th>신청</th>
+                          <th>정원</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody>
+                      <tr>
+                        <td class="lecture-name-col"><span title="과학기술의철학적55555555이해">과학기술의철학적55555555이해</span></td>
+                        <td>CSE2009</td>
+                        <td>10021</td>
+                        <td>김예티</td>
+                        <td>33</td>
+                        <td>35</td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+
+            <div class="col s2"></div>
+
+            <div class="col s5 tracing-lecture-table">
+                <table class="highlight lectures-table">
+                    <thead>
+                      <tr>
+                          <th class="lecture-name-col">강의명</th>
+                          <th>학수 번호</th>
+                          <th>수업 번호</th>
+                          <th>교수</th>
+                          <th>신청</th>
+                          <th>정원</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody>
+                      <tr>
+                        <td class="lecture-name-col"><span title="과학기술의철학적55555555이해">과학기술의철학적55555555이해</span></td>
+                        <td>CSE2009</td>
+                        <td>10021</td>
+                        <td>김예티</td>
+                        <td>33</td>
+                        <td>35</td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+</body>
+
+</html>
