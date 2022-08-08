@@ -7,23 +7,45 @@
 </head>
 <link rel="stylesheet" href="./materialize/css/materialize.min.css">
 <script src="./materialize/js/materialize.min.js"></script>
+<link rel="stylesheet" href="./style.css">
+<script src="./main.js"></script>
 
 <body>
-    <div class="divider"></div>
-    <div class="section">
-      <h5>Section 1</h5>
-      <p>Stuff</p>
-    </div>
-    <div class="divider"></div>
-    <div class="section">
-      <h5>Section 2</h5>
-      <p>Stuff</p>
-    </div>
-    <div class="divider"></div>
-    <div class="section">
-      <h5>Section 3</h5>
-      <p>Stuff</p>
-    </div>
+    <div class="container">
+        <div class="row search-form-container">
+            <div class="col s6">
+                <div class="row no-bottom-margin">
+
+                    <div class="input-field col s2">
+                        <input value="2022" id="year" type="text" class="validate">
+                        <label for="year">년도*</label>
+                    </div>
+
+                    <div class="input-field col s2">
+                        <select>
+                          <option value="1" selected>1학기</option>
+                          <option value="2">2학기</option>
+                          <option value="3">여름학기</option>
+                          <option value="3">겨울학기</option>
+                        </select>
+                        <label>학기*</label>
+                    </div>
+
+                    <div class="input-field col s6">
+                        <input placeholder="강의 이름" value="" id="lecture-name" type="text" class="validate">
+                        <label for="lecture-name">강의명*</label>
+                    </div>
+
+                    <div class="col s2">
+                        <div class="row no-bottom-margin" style="margin-top: 28px;">
+                            <a class="waves-effect waves-light btn-small">Button</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="divider"></div>
 </body>
 
 </html>
