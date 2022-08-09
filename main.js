@@ -104,6 +104,10 @@ const onSearchBtnClick = async () => {
 
 ////// VIEW
 
+const makeToast = (message) => {
+    M.toast({html: message});
+}
+
 // clear all rows when index -1
 const clearTable = (target, index = -1) => {
     let numRows = target.rows.length;
@@ -172,6 +176,7 @@ const showSearchResult = (searchResults) => {
 const addTracingLecture = (lecture) => {
     if (ref.tracingLectures[lecture.lectureNum]) {
         // alert this lecture is already enrolled
+        makeToast("this lecture is already enrolled");
         return;
     }
 
