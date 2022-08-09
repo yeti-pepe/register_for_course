@@ -1,9 +1,12 @@
-const FOUND_SEARCH_RESULTS_EVENT = "found_search_results_event";
-
+const SHOW_SEARCH_RESULTS_EVENT = "show_search_results_event";
+const ADD_TRACING_LECTURE_EVENT = "add_tracing_lecture_event";
+const REMOVE_TRACING_LECTURE_EVENT = '_remove_tracing_lecture_event';
+const ALERT_LECTURE_EVENT = "_alert_lecture_event";
+const INVALID_LECTURE_EVENT = "_invalid_lecture_event";
 
 const observer = new Observer();
 const ref = {
-    tracingLectures: []
+    tracingLectures: {}
 };
 
 class Lecture {
@@ -96,7 +99,7 @@ const onSearchBtnClick = async () => {
     let lectureName = document.getElementById('lecture-name').value;
     let searchResults = await search(year, semester, lectureName);
 
-    observer.notify(FOUND_SEARCH_RESULTS_EVENT, searchResults, 1);
+    observer.notify(SHOW_SEARCH_RESULTS_EVENT, searchResults, 1);
 }
 
 ////// VIEW
@@ -136,6 +139,18 @@ const pushOnTable = (target, lecture, onclick) => {
     return newRow;
 }
 
+const removeFromTable = (target, lecture) => {
+    let rows = target.rows;
+
+    for (let i = 0; i < rows.length; i++) {
+        let lecNumCell = rows[i].cells[2];
+        if (lecNumCell.innerText === lecture.lectureNum) {
+            target.deleteRow(i);
+            return;
+        }
+    }
+}
+
 
 ////// OBSERVER EVENT HANDLER 
 
@@ -145,16 +160,51 @@ const showSearchResult = (searchResults) => {
 
     for (let i = 0; i < searchResults.length; i++) {
         let lecture = searchResults[i];
-        // let onclick = () => {}
+
+        let onclick = () => {
+            observer.notify(ADD_TRACING_LECTURE_EVENT, lecture);
+        }
         
-        let row = pushOnTable(table, lecture);
+        pushOnTable(table, lecture, onclick);
     }
 }
+
+const addTracingLecture = (lecture) => {
+    if (ref.tracingLectures[lecture.lectureNum]) {
+        // alert this lecture is already enrolled
+        return;
+    }
+
+    ref.tracingLectures[lecture.lectureNum] = lecture;
+    let table = document.getElementById('tracing-lecture-table');
+
+    let onclick = () => {
+        delete ref.tracingLectures[lecture.lectureNum];
+        observer.notify(lecture.lectureNum + REMOVE_TRACING_LECTURE_EVENT);
+    }
+
+    let row = pushOnTable(table, lecture, onclick);
+    
+    let alertLecEventId = observer.regist(lecture.lectureNum + ALERT_LECTURE_EVENT, () => {
+        row.classList.add('alert');
+    });
+    let invalidLecEventId = observer.regist(lecture.lectureNum + INVALID_LECTURE_EVENT, () => {
+        row.classList.remove('alert');
+    });
+    
+    observer.once(lecture.lectureNum + REMOVE_TRACING_LECTURE_EVENT, () => {
+        observer.unregistById(alertLecEventId);
+        observer.unregistById(invalidLecEventId);
+        removeFromTable(table, lecture);
+    })
+}
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('select');
     var instances = M.FormSelect.init(elems, {});
 
-    observer.regist(FOUND_SEARCH_RESULTS_EVENT, showSearchResult);
+    observer.regist(SHOW_SEARCH_RESULTS_EVENT, showSearchResult);
+    observer.regist(ADD_TRACING_LECTURE_EVENT, addTracingLecture);
 });
