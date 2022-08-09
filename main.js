@@ -3,18 +3,8 @@ const FOUND_SEARCH_RESULTS_EVENT = "found_search_results_event";
 
 const observer = new Observer();
 const ref = {
-    searchResults: [],
-    tracingLectures: [],
+    tracingLectures: []
 };
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    var elems = document.querySelectorAll('select');
-    var instances = M.FormSelect.init(elems, {});
-
-    // observer.regist(FOUND_SEARCH_RESULTS_EVENT, )
-});
 
 class Lecture {
     constructor() {
@@ -88,7 +78,12 @@ const search = async (year, semester, lectureName) => {
 
     if (lectures) {
         let list = lectures.DS_SUUPGS03TTM01[0].list;
-        result.concat(list);
+
+        for (let i = 0; i < list.length; i++) {
+            let lecture = new Lecture();
+            lecture.parse(list[i]);
+            result.push(lecture);
+        }
     }
     return result;
 }
@@ -99,6 +94,67 @@ const onSearchBtnClick = async () => {
     let year = document.getElementById('year').value;
     let semester = document.getElementById('semester').value;
     let lectureName = document.getElementById('lecture-name').value;
-    let result = await search(year, semester, lectureName);
-    console.log(result);
+    let searchResults = await search(year, semester, lectureName);
+
+    observer.notify(FOUND_SEARCH_RESULTS_EVENT, searchResults, 1);
 }
+
+////// VIEW
+
+// clear all rows when index -1
+const clearTable = (target, index = -1) => {
+    let numRows = target.rows.length;
+
+    if (index > -1) target.deleteRow(index);
+    else {
+        for (let i = 0; i < numRows; i++)
+            target.deleteRow(-1);
+    }
+}
+
+const pushOnTable = (target, lecture, onclick) => {
+    let newRow = target.insertRow();
+    
+    let lecNameCell = newRow.insertCell(0);
+    // give ... option on too much long name
+    lecNameCell.classList.add("lecture-name-col");
+    lecNameCell.innerHTML = `<span title="${lecture.lectureName}">${lecture.lectureName}</span>`
+
+    let hakNumCell = newRow.insertCell(1);
+    hakNumCell.innerText = lecture.hakNum;
+    let lecNumCell = newRow.insertCell(2);
+    lecNumCell.innerText = lecture.lectureNum;
+    let professorNameCell = newRow.insertCell(3);
+    professorNameCell.innerText = lecture.professor;
+    let applicantsCell = newRow.insertCell(4);
+    applicantsCell.innerText = lecture.applicants;
+    let limitCell = newRow.insertCell(5);
+    limitCell.innerText = lecture.limit;
+
+    if (onclick) newRow.onclick = onclick;
+
+    return newRow;
+}
+
+
+////// OBSERVER EVENT HANDLER 
+
+const showSearchResult = (searchResults) => {
+    let table = document.getElementById('search-result-table');
+    clearTable(table);
+
+    for (let i = 0; i < searchResults.length; i++) {
+        let lecture = searchResults[i];
+        // let onclick = () => {}
+        
+        let row = pushOnTable(table, lecture);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems, {});
+
+    observer.regist(FOUND_SEARCH_RESULTS_EVENT, showSearchResult);
+});
