@@ -25,3 +25,22 @@
 .lectures-table td th{
     padding: 8px 2px;
 }
+
+.search-result-table-container {
+    max-height: 75vh;
+    overflow: auto;
+}
+
+.search-result-table-container {
+    max-height: 75vh;
+    overflow: auto;
+}
+
+.tracing-lecture-table-container {
+    max-height: 75vh;
+    overflow: auto;
+}
+
+.alert {
+    background-color: crimson;
+}
