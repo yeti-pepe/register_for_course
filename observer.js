@@ -87,8 +87,9 @@ class Observer {
         if (eventHandler == undefined) return;
 
         let args = [];
-        args = args.concat(...arguments);
-        args.splice(0,1);
+        for (let i = 1; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
 
         for(let i=eventHandler.length-1; i>=0; i--) {
             let currentHandler = eventHandler[i];
