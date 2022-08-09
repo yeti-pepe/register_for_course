@@ -1,18 +1,25 @@
 const SHOW_SEARCH_RESULTS_EVENT = "show_search_results_event";
 const ADD_TRACING_LECTURE_EVENT = "add_tracing_lecture_event";
 const REMOVE_TRACING_LECTURE_EVENT = '_remove_tracing_lecture_event';
-const ALERT_LECTURE_EVENT = "_alert_lecture_event";
-const INVALID_LECTURE_EVENT = "_invalid_lecture_event";
+// const ALERT_LECTURE_EVENT = "_alert_lecture_event";
+// const INVALID_LECTURE_EVENT = "_invalid_lecture_event";
+const UPDATE_LECTURE_STATUS = "_update_lecture_status";
+const TRACE_LECTURE_EVENT = "trace_lecture_event";
+const STOP_TRACING_EVENT = "stop_tracing_event";
 
 const observer = new Observer();
 const ref = {
-    tracingLectures: {}
+    tracingLectures: {},
+    isTracing: false,
+    times: 0
 };
 
 class Lecture {
     constructor() {
         this.lectureName = "";
         this.hakNum = "";
+        this.year = "";
+        this.semester = "";
         this.lectureNum = "";
         this.professor = "";
         this.applicants = 0;
@@ -21,6 +28,8 @@ class Lecture {
 
     parse(raw) {
         this.lectureName = raw.gwamokNm;
+        this.year = raw.suupYear;
+        this.semester = raw.suupTerm;
         this.hakNum = raw.haksuNo;
         this.lectureNum = raw.suupNo;
         this.professor = raw.gyogangsaNms;
@@ -181,35 +190,71 @@ const addTracingLecture = (lecture) => {
     }
 
     ref.tracingLectures[lecture.lectureNum] = lecture;
+    
     let table = document.getElementById('tracing-lecture-table');
-
     let onclick = () => {
-        delete ref.tracingLectures[lecture.lectureNum];
         observer.notify(lecture.lectureNum + REMOVE_TRACING_LECTURE_EVENT);
     }
-
     let row = pushOnTable(table, lecture, onclick);
     
-    let alertLecEventId = observer.regist(lecture.lectureNum + ALERT_LECTURE_EVENT, () => {
-        row.classList.add('alert');
-    });
-    let invalidLecEventId = observer.regist(lecture.lectureNum + INVALID_LECTURE_EVENT, () => {
-        row.classList.remove('alert');
-    });
+    let updateLecStatEventId = observer.regist(lecture.lectureNum + UPDATE_LECTURE_STATUS, (newStatus) => {
+        if (newStatus.applicants !== lecture.applicants) lecture.applicants = newStatus.applicants;
+
+        if (lecture.applicants !== lecture.limit) row.classList.add('alert');
+        else row.classList.remove('alert');
+    })
     
     observer.once(lecture.lectureNum + REMOVE_TRACING_LECTURE_EVENT, () => {
-        observer.unregistById(alertLecEventId);
-        observer.unregistById(invalidLecEventId);
+        delete ref.tracingLectures[lecture.lectureNum];
+        observer.unregistById(updateLecStatEventId);
         removeFromTable(table, lecture);
+
+        if (Object.keys(ref.tracingLectures).length === 0)
+            observer.notify(STOP_TRACING_EVENT);
     })
+
+    if (Object.keys(ref.tracingLectures).length === 1)
+        observer.notify(TRACE_LECTURE_EVENT);
 }
 
+const traceLecture = () => {
+    if (ref.isTracing) return;
+    ref.isTracing = true;
+
+    let timeoutFunc = async() => {
+        for (let item in ref.tracingLectures) {
+            let lecture = ref.tracingLectures[item];
+            let results = await search(lecture.year, lecture.semester, lecture.lectureName);
+
+            for (let i = 0; i < results.length; i++) {
+                let result = results[i];
+
+                if (result.lectureNum === lecture.lectureNum) {
+                    observer.notify(lecture.lectureNum + UPDATE_LECTURE_STATUS, result);
+                    break;
+                }
+            }
+        }
+
+        document.getElementById("times").innerText = ref.times++;
+        if (ref.isTracing) setTimeout(timeoutFunc, 300);
+    }
+
+    setTimeout(timeoutFunc, 300);
+}
+
+const stopTracing = () => {
+    ref.isTracing = false;
+}
 
 
 document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('select');
     var instances = M.FormSelect.init(elems, {});
-
+    // register event on observer
     observer.regist(SHOW_SEARCH_RESULTS_EVENT, showSearchResult);
     observer.regist(ADD_TRACING_LECTURE_EVENT, addTracingLecture);
+    observer.regist(TRACE_LECTURE_EVENT, traceLecture);
+    observer.regist(STOP_TRACING_EVENT, stopTracing);
+    // trace lectures
 });
