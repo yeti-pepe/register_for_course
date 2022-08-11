@@ -7,6 +7,8 @@ const UPDATE_LECTURE_STATUS = "_update_lecture_status";
 const TRACE_LECTURE_EVENT = "trace_lecture_event";
 const STOP_TRACING_EVENT = "stop_tracing_event";
 
+const SOUND_TYPE = ["sine", "square", "triangle", "sawtooth"]
+
 const observer = new Observer();
 const ref = {
     tracingLectures: {},
@@ -100,8 +102,6 @@ const search = async (year, semester, lectureName) => {
     return result;
 }
 
-
-
 const onSearchBtnClick = async () => {
     let year = document.getElementById('year').value;
     let semester = document.getElementById('semester').value;
@@ -109,6 +109,19 @@ const onSearchBtnClick = async () => {
     let searchResults = await search(year, semester, lectureName);
 
     observer.notify(SHOW_SEARCH_RESULTS_EVENT, searchResults, 1);
+}
+
+const makeSound = () => {
+    let context = new AudioContext();
+    let osc = context.createOscillator();
+    let g = context.createGain();
+
+    osc.type = SOUND_TYPE[Math.floor(Math.random() * 4)];
+    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 5);
+    
+    osc.connect(g);
+    g.connect(context.destination);
+    osc.start();
 }
 
 ////// VIEW
@@ -200,7 +213,10 @@ const addTracingLecture = (lecture) => {
     let updateLecStatEventId = observer.regist(lecture.lectureNum + UPDATE_LECTURE_STATUS, (newStatus) => {
         if (newStatus.applicants !== lecture.applicants) lecture.applicants = newStatus.applicants;
 
-        if (lecture.applicants !== lecture.limit) row.classList.add('alert');
+        if (lecture.applicants !== lecture.limit) {
+            row.classList.add('alert');
+            makeSound();
+        }
         else row.classList.remove('alert');
     })
     
